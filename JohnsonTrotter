@@ -1,0 +1,85 @@
+#include <stdio.h>
+#include <stdbool.h>
+
+#define MAX 10
+
+typedef struct {
+    int value;
+    int direction; // -1 for left, 1 for right
+} Element;
+
+void printPermutation(Element arr[], int n) {
+    for (int i = 0; i < n; i++) {
+        printf("%d ", arr[i].value);
+    }
+    printf("\n");
+}
+
+int getLargestMobile(Element arr[], int n) {
+    int largest_mobile_index = -1;
+    int largest_mobile_value = 0;
+
+    for (int i = 0; i < n; i++) {
+        int dir = arr[i].direction;
+        int adj = i + dir;
+
+        if (adj >= 0 && adj < n) {
+            if (arr[i].value > arr[adj].value && arr[i].value > largest_mobile_value) {
+                largest_mobile_value = arr[i].value;
+                largest_mobile_index = i;
+            }
+        }
+    }
+    return largest_mobile_index;
+}
+
+void johnsonTrotter(int n) {
+    Element arr[MAX];
+
+    for (int i = 0; i < n; i++) {
+        arr[i].value = i + 1;
+        arr[i].direction = -1;
+    }
+
+    printPermutation(arr, n);
+
+    while (true) {
+        int largest_mobile_index = getLargestMobile(arr, n);
+        if (largest_mobile_index == -1)
+            break;
+
+        int dir = arr[largest_mobile_index].direction;
+        int adj_index = largest_mobile_index + dir;
+
+        Element temp = arr[largest_mobile_index];
+        arr[largest_mobile_index] = arr[adj_index];
+        arr[adj_index] = temp;
+
+        largest_mobile_index = adj_index;
+
+        for (int i = 0; i < n; i++) {
+            if (arr[i].value > arr[largest_mobile_index].value) {
+                arr[i].direction = -arr[i].direction;
+            }
+        }
+
+        printPermutation(arr, n);
+    }
+}
+
+int main() {
+    int n;
+
+    printf("Enter the number of elements (max %d): ", MAX);
+    scanf("%d", &n);
+
+    if (n < 1 || n > MAX) {
+        printf("Invalid input! Please enter a number between 1 and %d.\n", MAX);
+        return 1;
+    }
+
+    johnsonTrotter(n);
+
+    return 0;
+}
+
